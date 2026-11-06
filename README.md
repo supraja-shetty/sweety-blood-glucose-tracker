@@ -1,107 +1,541 @@
 # Sweety – Blood Glucose Tracker
 
-A fresher-friendly full-stack app built with **React + Vite**, **Node.js + Express**, and **PostgreSQL**.
+A full-stack blood glucose tracking application built using **React, Vite, Node.js, Express.js and PostgreSQL**.
+
+Sweety helps patients record and manage their daily blood glucose readings, view reports and monitor monthly trends. It also provides a doctor portal where doctors can view assigned patients and their glucose reports.
+
+**GitHub Repository:** https://github.com/supraja-shetty/sweety-blood-glucose-tracker
+
+---
+
+## Technology Stack
+
+| Layer | Technologies |
+|---|---|
+| Frontend | React, Vite, JavaScript, HTML, CSS |
+| Backend | Node.js, Express.js |
+| Database | PostgreSQL |
+| Authentication | JWT, bcrypt |
+| API Communication | Axios |
+| Data Visualization | SVG Line Chart |
+| Testing | Node.js Built-in Test Runner |
+| Version Control | Git, GitHub |
+
+---
 
 ## Features
-- Register and log in; passwords are hashed with bcrypt.
-- JWT-protected API. Users can access only their own readings.
-- Create, list, edit, and delete glucose readings.
-- One reading per time slot per day, maximum four per day.
-- Daily, month-to-date, and previous-month reports.
-- Backend validation tests using Node's built-in test runner.
-- Demo seed script.
 
-## Requirements
-- Node.js 18+
-- PostgreSQL 14+
+### 1. Authentication and User Management
+- Patient registration with name, email and password.
+- Secure login using email and password.
+- Password hashing using bcrypt.
+- JWT-based authentication for protected API routes.
+- Role-based access control for patients and doctors.
+- Users can access only their own reading records.
 
-## 1. Database setup
-Create a PostgreSQL database:
+### 2. Patient Dashboard
+- Personalized dashboard after login.
+- Add, view, edit and delete glucose readings.
+- Select dates to view reading history and reports.
+- Display validation messages and success notifications.
+- Friendly empty states when no readings are available.
+
+### 3. Blood Glucose Reading Management
+
+Each reading contains:
+- Reading date
+- Time slot
+- Glucose value in mg/dl
+
+The four supported time slots are:
+
+1. Morning (fasting)
+2. After breakfast
+3. After lunch
+4. After dinner
+
+Patients can create, view, update and delete their own readings.
+
+### 4. Reading History and Pagination
+- View previously recorded glucose readings.
+- Display reading date, time slot and glucose value.
+- Edit and delete existing records.
+- Paginated reading history.
+- Support for page and limit query parameters.
+- Previous and Next navigation.
+
+### 5. Reports and Summary Cards
+
+The application provides three types of reports.
+
+**Daily Report**
+- Highest glucose reading.
+- Lowest glucose reading.
+- Average glucose reading.
+- Total number of readings.
+- Individual readings with their time slots.
+
+**Month-to-Date Report**
+- Covers the first day of the selected month through the selected date.
+- Displays highest, lowest and average readings.
+- Displays the total number of readings.
+
+**Previous-Month Report**
+- Covers the entire previous calendar month.
+- Displays highest, lowest and average readings.
+- Displays the total number of readings.
+
+All report averages are rounded to one decimal place. Friendly empty states are displayed when no readings are available.
+
+### 6. Monthly Glucose Chart
+- Line chart showing glucose readings across the selected month.
+- Displays glucose values against calendar days.
+- Helps users understand their recorded monthly trends.
+- Updates according to the selected month.
+- Displays an empty state when no readings are available.
+
+The chart is implemented using SVG.
+
+### 7. Doctor Portal
+
+The application supports separate patient and doctor roles.
+
+Doctor features include:
+- Doctor-specific dashboard.
+- View the list of assigned patients.
+- Display patient names and email addresses.
+- Select an assigned patient to view their glucose report.
+- View patient reading history and report summaries.
+- Restrict access to patients assigned to the logged-in doctor.
+
+Doctor routes require authentication and doctor-role authorization. The backend verifies patient assignments before returning patient information.
+
+### 8. Backend Security and Validation
+- Password hashing using bcrypt.
+- JWT-protected API endpoints.
+- Role-based authorization.
+- Patient-specific reading access.
+- Parameterized SQL queries.
+- Database constraints for duplicate reading prevention.
+- Transaction-based validation for the maximum-four-readings rule.
+- Backend input validation and error handling.
+
+---
+
+## Validation Rules
+
+| Rule | Expected Behavior |
+|---|---|
+| Reading value is required | Reject empty values |
+| Value must be a whole number | Reject decimal values |
+| Value must be between 40 and 600 mg/dl | Reject values outside the range |
+| Only one reading per slot per day | Reject duplicate time slots |
+| Maximum four readings per day | Reject additional readings |
+| Date cannot be in the future | Reject future dates |
+
+Validation is performed on the backend to prevent invalid data from being submitted by bypassing frontend controls.
+
+---
+
+## Reports and Calculations
+
+| Report | Date Range |
+|---|---|
+| Daily | Selected date |
+| Month-to-date | First day of the selected month through the selected date |
+| Previous month | Entire previous calendar month |
+
+Each report calculates:
+
+- Highest reading
+- Lowest reading
+- Average reading
+- Total number of readings
+
+**Average calculation:**
+
+`Average = Sum of readings / Number of readings`
+
+The result is rounded to one decimal place.
+
+---
+
+## Project Structure
+
+```text
+sweety-blood-glucose-tracker/
+│
+├── client/
+│   ├── .env.example
+│   ├── index.html
+│   ├── package.json
+│   ├── package-lock.json
+│   │
+│   └── src/
+│       ├── App.jsx
+│       ├── GlucoseChart.jsx
+│       ├── api.js
+│       ├── main.jsx
+│       └── styles.css
+│
+├── server/
+│   ├── .env.example
+│   ├── doctor-setup.sql
+│   ├── package.json
+│   ├── package-lock.json
+│   │
+│   ├── src/
+│   │   ├── db.js
+│   │   ├── index.js
+│   │   ├── seed.js
+│   │   ├── validation.js
+│   │   │
+│   │   ├── middleware/
+│   │   │   └── auth.js
+│   │   │
+│   │   └── routes/
+│   │       ├── auth.js
+│   │       ├── doctor.js
+│   │       ├── readings.js
+│   │       └── reports.js
+│   │
+│   └── test/
+│       └── validation.test.js
+│
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Prerequisites
+
+Install the following:
+
+- Node.js 18 or later
+- npm
+- PostgreSQL 14 or later
+- Git
+
+Verify the installations:
+
+```bash
+node --version
+npm --version
+psql --version
+```
+
+---
+
+## Installation and Setup
+
+### Step 1: Clone the Repository
+
+```bash
+git clone https://github.com/supraja-shetty/sweety-blood-glucose-tracker.git
+```
+
+Navigate to the project directory:
+
+```bash
+cd sweety-blood-glucose-tracker
+```
+
+### Step 2: Create the PostgreSQL Database
+
+Open PostgreSQL or pgAdmin and execute:
 
 ```sql
 CREATE DATABASE sweety;
 ```
 
-The server automatically creates the `users` and `readings` tables at startup using `server/src/db.js`.
+The backend initializes the required database tables when the server starts.
 
-## 2. Configure environment
-Copy `server/.env.example` to `server/.env` and set your PostgreSQL connection values and a long random JWT secret.
+### Step 3: Configure Backend Environment Variables
 
-Example:
+Navigate to the server folder:
+
+```bash
+cd server
+```
+
+On Windows:
+
+```cmd
+copy .env.example .env
+```
+
+On macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Configure `server/.env`:
+
 ```env
 PORT=5000
 DATABASE_URL=postgresql://postgres:your_password@localhost:5432/sweety
-JWT_SECRET=replace_this_with_a_long_random_secret
+JWT_SECRET=replace_with_a_long_random_secret
 CLIENT_URL=http://localhost:5173
 ```
 
-Copy `client/.env.example` to `client/.env`:
+Replace `your_password` with your local PostgreSQL password. Use a strong private JWT secret.
+
+### Step 4: Install and Start the Backend
+
+From the `server` directory:
+
+```bash
+npm install
+npm run dev
+```
+
+The backend runs at:
+
+`http://localhost:5000`
+
+Health check:
+
+`http://localhost:5000/api/health`
+
+### Step 5: Configure Frontend Environment Variables
+
+Open another terminal and navigate to the client folder:
+
+```bash
+cd client
+```
+
+On Windows:
+
+```cmd
+copy .env.example .env
+```
+
+On macOS/Linux:
+
+```bash
+cp .env.example .env
+```
+
+Configure `client/.env`:
+
 ```env
 VITE_API_URL=http://localhost:5000/api
 ```
 
-## 3. Install and run the server
+### Step 6: Install and Start the Frontend
+
+From the `client` directory:
+
+```bash
+npm install
+npm run dev
+```
+
+Open the Vite URL, normally:
+
+`http://localhost:5173`
+
+Keep both frontend and backend terminals running while using the application.
+
+---
+
+## Environment Variables
+
+### Backend – `server/.env`
+
+| Variable | Description |
+|---|---|
+| `PORT` | Backend server port |
+| `DATABASE_URL` | PostgreSQL connection string |
+| `JWT_SECRET` | Secret used to sign authentication tokens |
+| `CLIENT_URL` | Frontend URL allowed by CORS |
+
+### Frontend – `client/.env`
+
+| Variable | Description |
+|---|---|
+| `VITE_API_URL` | Backend API base URL |
+
+**Security:** Actual `.env` files are excluded from Git. Only example environment files are included in the repository.
+
+---
+
+## Demo Account and Seed Data
+
+The project includes a seed script that creates a demo patient account and sample glucose readings.
+
+After configuring the backend environment and initializing the database, run:
+
 ```bash
 cd server
-npm install
-npm run dev
+npm run seed
 ```
-The API runs at `http://localhost:5000`.
 
-## 4. Install and run the client
-Open another terminal:
-```bash
-cd client
-npm install
-npm run dev
+Demo login:
+
+| Field | Value |
+|---|---|
+| Email | `demo@sweety.test` |
+| Password | `SweetyDemo123!` |
+
+The seed script can be executed more than once. It resets the demo account's readings and inserts sample records for the current month.
+
+---
+
+## Doctor Account Setup
+
+To configure a doctor and assign a patient:
+
+1. Start the application and create doctor and patient accounts.
+2. Open pgAdmin and connect to the `sweety` database.
+3. Open the Query Tool.
+4. Open `server/doctor-setup.sql`.
+5. Replace the example email addresses with the actual doctor and patient account emails.
+6. Execute the SQL statements.
+
+The setup script promotes the selected account to the doctor role and creates the doctor-patient assignment.
+
+Example SQL:
+
+```sql
+UPDATE users
+SET role = 'doctor'
+WHERE email = 'doctor@example.com';
+
+INSERT INTO doctor_patients (doctor_id, patient_id)
+SELECT d.id, p.id
+FROM users d, users p
+WHERE d.email = 'doctor@example.com'
+  AND p.email = 'patient@example.com'
+  AND d.role = 'doctor'
+  AND p.role = 'patient'
+ON CONFLICT (doctor_id, patient_id) DO NOTHING;
 ```
-Open the Vite URL shown in the terminal (normally `http://localhost:5173`).
 
-## 5. Run tests
+A doctor can access only patients assigned to their account.
+
+---
+
+## API Documentation
+
+All API routes are prefixed with `/api`.
+
+### Authentication
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| POST | `/auth/register` | No | Register a user |
+| POST | `/auth/login` | No | Log in |
+
+### Reading Management
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| GET | `/readings?page=1&limit=20` | Yes | Get paginated own readings |
+| POST | `/readings` | Yes | Create a reading |
+| PUT | `/readings/:id` | Yes | Update own reading |
+| DELETE | `/readings/:id` | Yes | Delete own reading |
+
+### Reports
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| GET | `/reports/daily?date=YYYY-MM-DD` | Yes | Get daily report |
+| GET | `/reports/month-to-date?date=YYYY-MM-DD` | Yes | Get month-to-date report |
+| GET | `/reports/previous-month?date=YYYY-MM-DD` | Yes | Get previous-month report |
+
+### Doctor
+
+| Method | Endpoint | Authentication | Purpose |
+|---|---|---|---|
+| GET | `/doctor/patients` | Doctor | List assigned patients |
+| GET | `/doctor/patients/:patientId/report` | Doctor | View an assigned patient's report |
+
+Doctor endpoints require authentication, doctor-role authorization and patient-assignment verification.
+
+---
+
+## Testing
+
+The backend includes validation tests using Node.js's built-in test runner.
+
+Run the tests:
+
 ```bash
 cd server
 npm test
 ```
 
-## 6. Seed demo data
-After configuring `server/.env` and starting/initializing the database:
-```bash
-cd server
-npm run seed
-```
-Demo login:
-- Email: `demo@sweety.test`
-- Password: `SweetyDemo123!`
+---
 
-The seed script is safe to run more than once: it resets readings for the demo account and inserts sample records for the current month.
+## Database Design
 
-## API overview
-All routes are prefixed with `/api`.
+### Users
 
-| Method | Route | Auth | Purpose |
-|---|---|---:|---|
-| POST | `/auth/register` | No | Create account |
-| POST | `/auth/login` | No | Log in |
-| GET | `/readings` | Yes | List own readings |
-| POST | `/readings` | Yes | Add reading |
-| PUT | `/readings/:id` | Yes | Update own reading |
-| DELETE | `/readings/:id` | Yes | Delete own reading |
-| GET | `/reports/daily?date=YYYY-MM-DD` | Yes | Daily summary and slot details |
-| GET | `/reports/month-to-date?date=YYYY-MM-DD` | Yes | From month start through selected date |
-| GET | `/reports/previous-month?date=YYYY-MM-DD` | Yes | Entire previous calendar month |
+Stores account and authentication information.
 
-## Validation and assumptions
-- Dates are stored as PostgreSQL `DATE` values and interpreted as calendar dates, not timestamps.
-- The four slot labels are fixed and case-sensitive.
-- A reading value must be an integer from 40 through 600 mg/dl.
-- A date later than today's server date is rejected.
-- The database has a unique constraint on `(user_id, reading_date, slot)` as a second line of protection against duplicate slots.
-- The maximum-four-per-day rule is checked in a transaction with a per-user/day advisory lock to reduce race conditions.
-- Reports include all readings in their requested date range and round the average to one decimal place.
-- This is an educational tracking app, not a medical device. It does not provide diagnosis or treatment advice.
+| Column | Purpose |
+|---|---|
+| `id` | Primary key |
+| `name` | User name |
+| `email` | Unique email |
+| `password_hash` | Hashed password |
+| `role` | Patient or doctor |
+| `created_at` | Account creation timestamp |
 
-## What I would improve with more time
-- Add pagination and a monthly chart.
-- Add refresh-token/session management, rate limiting, and stronger account recovery.
-- Add end-to-end tests and CI.
-- Deploy the API, database, and frontend with managed secrets and HTTPS.
+### Readings
+
+Stores patient glucose readings.
+
+| Column | Purpose |
+|---|---|
+| `id` | Primary key |
+| `user_id` | Reference to patient |
+| `reading_date` | Reading date |
+| `slot` | Daily time slot |
+| `value` | Glucose value in mg/dl |
+| `created_at` | Creation timestamp |
+| `updated_at` | Last update timestamp |
+
+A unique constraint on `(user_id, reading_date, slot)` prevents duplicate readings for the same patient, date and slot.
+
+### Doctor Patients
+
+Stores doctor-patient assignments.
+
+| Column | Purpose |
+|---|---|
+| `doctor_id` | Reference to doctor |
+| `patient_id` | Reference to patient |
+| `assigned_at` | Assignment timestamp |
+
+The doctor-patient combination is unique to prevent duplicate assignments.
+
+---
+
+## Notes
+
+### Assumptions
+- Maximum four readings per patient per day, one per time slot.
+- Glucose values must be between 40 and 600 mg/dl.
+- Future dates are not allowed.
+- Doctors can access only their assigned patients.
+
+### Future Improvements
+- Add frontend and end-to-end testing.
+- Improve authentication and application security.
+
+
+## Author
+
+**Supraja Shetty**
+
+- GitHub: https://github.com/supraja-shetty/
+- LinkedIn: https://linkedin.com/in/supraja-shetty-982324268/
+
+---
+
+**Built as a full-stack development assignment using React, Node.js, Express.js and PostgreSQL.**
